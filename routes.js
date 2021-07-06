@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 router.post('/joinRoom', (req, res) => {
   // TODO check if room exists //done
   roomID = req.body.roomID
-  console.log({ roomID })
+  console.log({ roomID }, 'routes.js')
   Room.findOne({ roomID }).then(roomOB => {
     if (!roomOB) {
       console.log('room not exist');
