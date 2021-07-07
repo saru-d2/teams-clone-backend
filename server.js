@@ -23,7 +23,7 @@ require('./socketio')(io)
 
 // mongoose
 const mongoose = require('mongoose');
-MONGO_URL = 'mongodb://localhost:27017/'
+MONGO_URL = process.env.MONGODB_URI || 'mongodb://localhost:27017/'
 MONGO_DB = 'teams-clone'
 mongoose.connect(MONGO_URL + MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }).then(() => console.log('connected to mongoDB')).catch(err => console.log('err'));
 mongoose.connection.once('open', () => console.log('connected'))
