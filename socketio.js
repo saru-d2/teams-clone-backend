@@ -18,7 +18,7 @@ module.exports = function (io) {
             }
             socketToRoom[socket.id] = roomID;
             const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
-
+            console.log(users)
             socket.emit("all users", usersInThisRoom);
         });
 
@@ -32,12 +32,28 @@ module.exports = function (io) {
 
         socket.on('disconnect', () => {
             const roomID = socketToRoom[socket.id];
+            console.log(socket.id)
             let room = users[roomID];
             if (room) {
                 room = room.filter(id => id !== socket.id);
-                users[roomID] = room;
+                users[roomID] = room
+                
+                room.map(user => {
+                    io.to(user).emit('user-left', {userID: socket.id})
+                })
             }
         });
+
+        socket.on('new-msg', (roomID) => {
+            console.log('new-msg from ', roomID)
+            let room = users[roomID];
+            console.log(room)
+            if(room) {
+                room.map(user => {
+                    io.to(user).emit('msg-sent')
+                })
+            }
+        })
 
     });
 }
