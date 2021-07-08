@@ -14,6 +14,9 @@ module.exports = function (io) {
                 }
                 users[roomID].push(socket.id);
             } else {
+
+
+                
                 users[roomID] = [socket.id];
             }
             socketToRoom[socket.id] = roomID;
