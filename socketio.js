@@ -1,3 +1,5 @@
+const Room = require('./models/roomModel')
+
 module.exports = function (io) {
 
     let users = {}
@@ -14,9 +16,6 @@ module.exports = function (io) {
                 }
                 users[roomID].push(socket.id);
             } else {
-
-
-                
                 users[roomID] = [socket.id];
             }
             socketToRoom[socket.id] = roomID;
@@ -47,15 +46,40 @@ module.exports = function (io) {
             }
         });
 
-        socket.on('new-msg', (roomID) => {
-            console.log('new-msg from ', roomID)
-            let room = users[roomID];
-            console.log(room)
-            if(room) {
-                room.map(user => {
-                    io.to(user).emit('msg-sent')
-                })
-            }
+        // socket.on('new-msg', (roomID) => {
+        //     console.log('new-msg from ', roomID)
+        //     let room = users[roomID];
+        //     console.log(room)
+        //     if(room) {
+        //         room.map(user => {
+        //             io.to(user).emit('msg-sent')
+        //         })
+        //     }
+        // })
+
+        socket.on('new-msg', (req) => {
+            roomID = req.roomID;
+            msg = req.msg;
+            from = req.from;
+            console.log(req)
+            let usersInRoom = users[roomID];
+            Room.findOne({ roomID }).then(room => {
+                if (!room) {
+                    socket.emit('no-room')
+                    console.log('no-room')
+                }
+                else {
+                const new_msg = {
+                  msg: msg, 
+                  from : from
+                }
+                room.msg_list.push(new_msg)
+                room.save();
+                if (usersInRoom)
+                usersInRoom.map(userID => {
+                    io.to(userID).emit('msg-sent', room.msg_list)
+                })}
+              })
         })
 
     });
