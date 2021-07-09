@@ -1,16 +1,22 @@
+// for heroku
 require('dotenv').config()
+
+// importing
 const express = require('express')
 const cors = require('cors');
 const http = require('http');
 const bodyParser = require('body-parser')
+
 
 const app = express()
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// creating server !important
 const server = http.createServer(app);
 const PORT = process.env.PORT || 4000
+
 //socketio
 const io = require("socket.io")(server, {
         cors: {
@@ -18,7 +24,6 @@ const io = require("socket.io")(server, {
                 methods: ["GET", "POST"],
     },
 })
-
 require('./socketio')(io)
  
 
@@ -33,13 +38,11 @@ mongoose.connection.once('open', () => console.log('connected'))
     });
 // -- 
 
-//TODO remove debug flag
 
+// router
 const routes = require('./routes');
-
 app.use('/', routes)
 
-//TODO move socketio code to its own file // done
 
 server.listen(PORT, () => {
     console.log("Server is running on Port: " + PORT);

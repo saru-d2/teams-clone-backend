@@ -1,18 +1,26 @@
 const express = require("express");
 const router = express.Router();
+
+// Room Mongoose model for database interaction
 const Room = require('./models/roomModel')
-const uuid = require('uuid').v4
 
-
+// test
+// @route POST /
+// @desc To check if backend is running
+// @access Public
 router.get('/', (req, res) => {
   res.json({ msg: 'running' });
 })
 
+// user joining room
+// @route POST /joinRoom
+// @desc allows user to join room, takes rooID as input
+// @access Public
 router.post('/joinRoom', (req, res) => {
-  // TODO check if room exists //done
   roomID = req.body.roomID
   console.log({ roomID }, 'routes.js')
   Room.findOne({ roomID }).then(roomOB => {
+    //check if room exists in database 
     if (!roomOB) {
       console.log('room not exist');
       return res.json({ room_exists: false })
@@ -25,9 +33,14 @@ router.post('/joinRoom', (req, res) => {
   })
 })
 
+// user create room
+// @route POST /CreateRoom
+// @desc allows user to create room, takes rooID as input
+// @access Public
 router.post('/CreateRoom', (req, res) => {
   roomID = req.body.roomID
   Room.findOne({ roomID }).then(roomOB => {
+    //checks if room exists prior to creation
     if (roomOB) {
       console.log('room already exists');
       return res.json({ room_exists: true })
@@ -43,10 +56,14 @@ router.post('/CreateRoom', (req, res) => {
     return res.json({ room_exists: true, roomID: roomOB.roomID })
   }).catch(err => {
     console.log(err);
-    return res.json({ err: err })
+    return res.status(500).json({ err: err })
   })
 })
 
+// send message from user to room 
+// @route POST /sendMsg
+// @desc allows user to join room, takes rooID as input
+// @access Public
 router.post('/sendMsg', (req, res) => {
   console.log(req.body);
   const msg = req.body.msg, from = req.body.from, roomID = req.body.roomID;
@@ -58,6 +75,8 @@ router.post('/sendMsg', (req, res) => {
       msg: msg, 
       from : from
     }
+
+    // save room.msg_list with new message from user
     room.msg_list.push(new_msg)
     room.save();
 
@@ -65,6 +84,10 @@ router.post('/sendMsg', (req, res) => {
   })
 })
 
+// request for messages from user 
+// @route POST /getMsg
+// @desc Sends messages from server to client
+// @access Public
 router.post('/getMsg', (req, res) => {
   console.log(req.body);
   const roomID = req.body.roomID;
