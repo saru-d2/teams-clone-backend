@@ -50,10 +50,10 @@ router.post('/CreateRoom', (req, res) => {
     })
     newRoom.save().then(room => {
       console.log(newRoom)
+      console.log(room)
+      return res.json({ room_exists: false, roomID: room.roomID })
     })
 
-    console.log(roomOB)
-    return res.json({ room_exists: true, roomID: roomOB.roomID })
   }).catch(err => {
     console.log(err);
     return res.status(500).json({ err: err })
